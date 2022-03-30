@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <title>Test API</title>
+</head>
+<body>
+  <div class="container py-4">
+    <h1>Test API</h1>
+    <div class="text-muted">note: prefilled with correct answers.</div>
+    <h2 class="mt-3">Post:</h2>
+    <textarea id="subText" class="form-control" rows="20" cols="60">
+      {
+        "first": "Bob",
+        "last": "Smith",
+        "answers": [
+          "a",
+          "c",
+          "f",
+          "green",
+          "one"
+        ]
+      }
+    </textarea>
+    <button class="btn btn-primary mt-1" id="subBtn">Submit JSON</button>
+    <button class="btn btn-primary mt-1" id="showAnswers">Show Q&A</button>
+    <button class="btn btn-primary mt-1" id="showAccepted">Show Accepted</button>
+    <button class="btn btn-primary mt-1" id="showRejected">Show Rejected</button>
+    <button class="btn btn-primary mt-1" id="showAll">Show All</button>
+    <button class="btn btn-primary mt-1" id="resetBtn">Reset</button>
+    <h2 class="mt-3">Response:</h2>
+    <textarea id="respText" class="form-control"rows="20" cols="60" readonly>Response will show here</textarea>
+  </div>
+  <script>
+    const subBtn = document.getElementById('subBtn')
+    const showAnswers = document.getElementById('showAnswers')
+    const showAccepted = document.getElementById('showAccepted')
+    const showRejected = document.getElementById('showRejected')
+    const showAll = document.getElementById('showAll')
+    const subText = document.getElementById('subText')
+    const respText = document.getElementById('respText')
+    const resetBtn = document.getElementById('resetBtn')
+
+    subBtn.addEventListener('click', () => {
+      fetch('/check', {
+        method: 'POST',
+        body: subText.value,
+        headers: {'Content-Type': 'application/json'}
+      })
+        .then(r => r.text())
+        .then(t => respText.value = JSON.stringify(JSON.parse(t),null, 4));
+      });
+
+    //handle canned calls
+    const fetchGets = url => fetch(url)
+        .then(r => r.text())
+        .then(t => respText.value = JSON.stringify(JSON.parse(t),null, 4));
+    showAnswers.addEventListener('click', () => {fetchGets('/q')});
+    showAccepted.addEventListener('click', () => {fetchGets('/a')});
+    showRejected.addEventListener('click', () => {fetchGets('/r')});
+    showAll.addEventListener('click', () => {fetchGets('/all')});
+    resetBtn.addEventListener('click', () => {fetchGets('/reset')});
+  </script>
+</body>
+</html>
