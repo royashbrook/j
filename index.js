@@ -13,20 +13,15 @@ app.use(bp.json());
 //setting some file paths
 const indexHtml = path.resolve('index.html');
 const questionsJson = path.resolve('questions.json');
-const acceptedJson = path.resolve('accepted.json');
-const dbFile = path.resolve('db.json');
 
 //'database' helpers
+let db = [];
 const writedb = submission => {
-  const db = JSON.parse(fs.readFileSync(dbFile, 'utf-8'));
   submission.id = uuidv4();
   db.push(submission);
-  const dbContents = JSON.stringify(db);
-  fs.writeFileSync(dbFile, dbContents);
 };
 
 const readdb = accepted => {
-  const db = JSON.parse(fs.readFileSync(dbFile, 'utf-8'));
   return JSON.stringify(db.filter(x => x.accepted === accepted));
 };
 
@@ -40,7 +35,7 @@ app.get('/', (req, res) => res.sendFile(indexHtml));
 app.get('/q', (req, res) => res.sendFile(questionsJson));
 app.get('/a', (req, res) => res.end(readdb(true)));
 app.get('/r', (req, res) => res.end(readdb(false)));
-app.get('/all', (req, res) => res.sendFile(dbFile));
+app.get('/all', (req, res) => res.end(JSON.stringify(db)));
 
 //checker
 app.post('/check', (req, res) => {
@@ -53,8 +48,8 @@ app.post('/check', (req, res) => {
 
 //resetter
 app.get('/reset', (req, res) => {
-  fs.writeFileSync(dbFile, "[]");
-  res.sendFile(dbFile)
+  db = []
+  res.end(JSON.stringify(db))
 });
 
 //listen
